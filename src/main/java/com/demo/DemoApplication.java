@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 import com.demo.event.consumer.DBCircutStateEventConumer;
-import com.demo.exception.DBTimeOutException;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker.EventPublisher;
@@ -32,8 +31,7 @@ public class DemoApplication {
 				.permittedNumberOfCallsInHalfOpenState(1)
 				.slidingWindow(6, 2, CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
 				.slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
-				.recordExceptions(SocketTimeoutException.class)
-				.recordException(t -> t instanceof DBTimeOutException)
+				.recordException(t -> t instanceof SocketTimeoutException)
 				.build();
 	}
 

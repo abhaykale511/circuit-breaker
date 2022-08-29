@@ -1,49 +1,62 @@
 package com.demo.aspect;
 
+import static com.demo.util.SupplierUtil.rethrowSupplier;
+
 import java.net.SocketTimeoutException;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.demo.exception.DBTimeOutException;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
-import io.vavr.control.Try;
+import io.github.resilience4j.decorators.Decorators;
 
 @Aspect
 @Component
 public class DBAspect {
 	@Autowired
 	private CircuitBreaker circuitBreaker;
-	
+
+	private static final Logger LOG = LoggerFactory.getLogger(DBAspect.class);
 
 	@Around("execution(* com.demo.dao.*.*(..))")
 	public Object circuitWrap(ProceedingJoinPoint joinPoint) throws Throwable {
 
 		MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
-		String className = methodSignature.getDeclaringType().getSimpleName();
+		String className = methodSignature.getDeclaringType().getName();
 		String methodName = methodSignature.getName();
-
-		System.out.println("Before method call:" + className + "." + methodName);
-
 		
-		Supplier<Object> objectSupplier = CircuitBreaker.decorateSupplier(circuitBreaker, () -> {
-			try {
-				return joinPoint.proceed();
-			} catch (SocketTimeoutException e) {
-				throw new DBTimeOutException(e);
-			} catch (Throwable e) {
-				throw new RuntimeException(e);
-			}
-		});
-		Object obj = Try.ofSupplier(objectSupplier).get();
+		Object returnValue = execute(rethrowSupplier(joinPoint::proceed), this::fallback);
 
-		System.out.println("After method call:" + className + "." + methodName);
-		return obj;
+		LOG.info("Around after class - {}, method - {}, returns - {}", className, methodName, returnValue);
+		
+		return returnValue;
 	}
+
+	private <T> T execute(Supplier<T> supplier, Function<Throwable, T> fallback) {
+		return Decorators.ofSupplier(supplier)
+				.withCircuitBreaker(circuitBreaker)
+				.withFallback(fallback)
+				.get();
+	}
+
+	private Object fallback(Throwable ex) {	
+		LOG.error("Exception during execution", ex);
+		
+		if(ex instanceof SocketTimeoutException)
+			throw new DBTimeOutException(ex.getMessage());
+		else {
+			throw new RuntimeException(ex.getMessage());
+		}
+	}
+
 }
