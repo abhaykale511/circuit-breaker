@@ -2,7 +2,6 @@ package com.demo.aspect;
 
 import static com.demo.util.SupplierUtil.rethrowSupplier;
 
-import java.net.SocketTimeoutException;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -13,9 +12,8 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import com.demo.exception.DBTimeOutException;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.decorators.Decorators;
@@ -26,6 +24,9 @@ public class DBAspect {
 	@Autowired
 	private CircuitBreaker circuitBreaker;
 
+	@Value("${circuit-aspect.enable}")
+	private boolean enableCircuitBreaker;
+
 	private static final Logger LOG = LoggerFactory.getLogger(DBAspect.class);
 
 	@Around("execution(* com.demo.dao.*.*(..))")
@@ -34,12 +35,16 @@ public class DBAspect {
 		MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
 		String className = methodSignature.getDeclaringType().getName();
 		String methodName = methodSignature.getName();
-		try {
+		if (enableCircuitBreaker) {
+			try {
 
-			returnValue = execute(rethrowSupplier(joinPoint::proceed), this::fallback);
-		} catch (Exception e) {
-			LOG.error("", e);
-			throw new Throwable(e);
+				returnValue = execute(rethrowSupplier(joinPoint::proceed), this::fallback);
+			} catch (Exception e) {
+				LOG.error("", e);
+				throw new Throwable(e);
+			}
+		} else {
+			returnValue = joinPoint.proceed();
 		}
 		LOG.info("Around after class - {}, method - {}, returns - {}", className, methodName, returnValue);
 
