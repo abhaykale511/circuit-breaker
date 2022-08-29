@@ -27,7 +27,7 @@ public class DemoApplication {
 
 	@Bean
 	public CircuitBreakerConfig cbConfig() {
-		return CircuitBreakerConfig.custom().failureRateThreshold(20).waitDurationInOpenState(Duration.ofMillis(1000))
+		return CircuitBreakerConfig.custom().failureRateThreshold(20).waitDurationInOpenState(Duration.ofMinutes(3))
 				.permittedNumberOfCallsInHalfOpenState(1)
 				.slidingWindow(6, 2, CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
 				.slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)

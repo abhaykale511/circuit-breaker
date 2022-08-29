@@ -1,11 +1,12 @@
 package com.demo.dao;
 
-import com.demo.dto.UserDetails;
-
 import java.net.SocketTimeoutException;
 import java.util.List;
+import java.util.Optional;
+
+import com.demo.dto.UserDetails;
 
 public interface UserRepo {
 
-    List<UserDetails> getAllUsers() throws SocketTimeoutException;
+    Optional<List<UserDetails>> getAllUsers() throws SocketTimeoutException;
 }

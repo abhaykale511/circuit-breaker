@@ -12,7 +12,7 @@ public class DBCircutStateEventConumer implements EventConsumer<CircuitBreakerOn
 
 	@Override
 	public void consumeEvent(CircuitBreakerOnStateTransitionEvent event) {
-		LOG.info("CircuitBraker: {} state transition: {}", event.getCircuitBreakerName(), event.getStateTransition());
+		LOG.info("{} {}", event.getCircuitBreakerName(), event.getStateTransition());
 
 		switch (event.getStateTransition()) {
 		case CLOSED_TO_OPEN:

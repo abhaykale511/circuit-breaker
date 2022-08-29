@@ -30,33 +30,28 @@ public class DBAspect {
 
 	@Around("execution(* com.demo.dao.*.*(..))")
 	public Object circuitWrap(ProceedingJoinPoint joinPoint) throws Throwable {
-
+		Object returnValue = null;
 		MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
 		String className = methodSignature.getDeclaringType().getName();
 		String methodName = methodSignature.getName();
-		
-		Object returnValue = execute(rethrowSupplier(joinPoint::proceed), this::fallback);
+		try {
 
+			returnValue = execute(rethrowSupplier(joinPoint::proceed), this::fallback);
+		} catch (Exception e) {
+			LOG.error("", e);
+			throw new Throwable(e);
+		}
 		LOG.info("Around after class - {}, method - {}, returns - {}", className, methodName, returnValue);
-		
+
 		return returnValue;
 	}
 
 	private <T> T execute(Supplier<T> supplier, Function<Throwable, T> fallback) {
-		return Decorators.ofSupplier(supplier)
-				.withCircuitBreaker(circuitBreaker)
-				.withFallback(fallback)
-				.get();
+		return Decorators.ofSupplier(supplier).withCircuitBreaker(circuitBreaker).withFallback(fallback).get();
 	}
 
-	private Object fallback(Throwable ex) {	
-		LOG.error("Exception during execution", ex);
-		
-		if(ex instanceof SocketTimeoutException)
-			throw new DBTimeOutException(ex.getMessage());
-		else {
-			throw new RuntimeException(ex.getMessage());
-		}
+	private Object fallback(Throwable ex) {
+		throw new RuntimeException(ex);
 	}
 
 }
