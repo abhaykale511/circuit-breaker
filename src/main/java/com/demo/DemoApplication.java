@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.ImportResource;
 
 import com.demo.event.consumer.DBCircutStateEventConumer;
 
@@ -19,6 +20,7 @@ import io.github.resilience4j.core.EventConsumer;
 
 @SpringBootApplication
 @EnableAspectJAutoProxy
+@ImportResource("classpath:beans.xml")
 public class DemoApplication {
 
 	public static void main(String[] args) {

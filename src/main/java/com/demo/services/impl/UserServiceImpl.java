@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
 		count++;
 		try {
 			return userRepo.getAllUsers().orElseGet(ArrayList::new);
-		} catch (SocketTimeoutException e) {
+		} catch (Exception e) {
 			LOG.error("DAO call failed", e);
 		}
 		return new ArrayList<>();
