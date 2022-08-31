@@ -1,17 +1,17 @@
-package com.demo.event.consumer;
+package com.demo.cb.consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.resilience4j.circuitbreaker.event.CircuitBreakerOnStateTransitionEvent;
-import io.github.resilience4j.core.EventConsumer;
 
-public class DBCircutStateEventConumer implements EventConsumer<CircuitBreakerOnStateTransitionEvent> {
+public class StateTranEventConsumer extends AbstractCBEventConsumer<CircuitBreakerOnStateTransitionEvent> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(DBCircutStateEventConumer.class);
+	private static final Logger LOG = LoggerFactory.getLogger(StateTranEventConsumer.class);
 
 	@Override
-	public void consumeEvent(CircuitBreakerOnStateTransitionEvent event) {
+	public void consume(CircuitBreakerOnStateTransitionEvent event) {
+
 		LOG.info("{} {}", event.getCircuitBreakerName(), event.getStateTransition());
 
 		switch (event.getStateTransition()) {
@@ -28,6 +28,8 @@ public class DBCircutStateEventConumer implements EventConsumer<CircuitBreakerOn
 			break;
 		}
 
+	
+		
 	}
 
 }

@@ -11,10 +11,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 public class ExceptionHandler {
 	
 	@org.springframework.web.bind.annotation.ExceptionHandler(Throwable.class)
-	public ResponseEntity<Object> execption(Throwable e){
+	public ResponseEntity<Object> exception(Throwable e){
 		Map<String, Object> map=new HashMap<>();
 		map.put("Message", e.getMessage());
-		//map.put("Cause", e.getCause());
 		return new ResponseEntity<Object>(map,HttpStatus.OK);
 		
 	}

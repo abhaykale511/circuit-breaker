@@ -1,4 +1,4 @@
-package com.demo.util;
+package com.demo.cb.util;
 
 import java.util.function.Supplier;
 

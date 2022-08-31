@@ -7,18 +7,46 @@
     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop 
     http://www.springframework.org/schema/aop/spring-aop.xsd">
 	<aop:config>
-		<aop:pointcut
-			expression="execution(* com.demo.dao.*.*(..))" id="daoPointCut" />
-
+		<aop:pointcut expression="execution(* com.demo.dao.*.*(..))" id="daoPointCut" />
+		
 		<aop:aspect id="daoCBAt" ref="daoCircuitBreakerAspect">
-			<aop:around method="circuitWrap"
-				pointcut-ref="daoPointCut" />
+			<aop:around method="circuitWrap" pointcut-ref="daoPointCut" />
 		</aop:aspect>
-
 	</aop:config>
+
 	<bean id="daoCircuitBreakerAspect"
-		class="com.demo.aspect.ResourceCircuitBreakerAspect" autowire="byType">
-		<property name="circuitBreakerFlagProp"
-			value="dao-circuit-aspect.enable" />
+		class="com.demo.cb.aspect.ResourceCircuitBreakerAspect">
+		<constructor-arg name="flagName" value="dao-circuit-aspect.enable" />
+		<constructor-arg name="cb" ref="daoCB" />
 	</bean>
+
+	<bean id="daoCBConfig" class="com.demo.cb.CBConfig">
+		<property name="recordExceptions">
+			<list>
+				<value>java.net.SocketTimeoutException</value>
+			</list>
+		</property>
+		<property name="failureRateThreshold" value="20f" />
+		<property name="waitIntervalFunctionInOpenState" value="60000" />
+		<property name="permittedNumberOfCallsInHalfOpenState" value="1" />
+		<property name="slidingWindowSize" value="6" />
+		<property name="minimumNumberOfCalls" value="6" />
+	</bean>
+
+	<bean id="daoCBRegistry" class="com.demo.cb.CBRegistry">
+		<constructor-arg name="cbConfig" ref="daoCBConfig" />
+	</bean>
+
+	<bean id="daoCB" class="com.demo.cb.CB">
+		<constructor-arg name="cbRegistry" ref="daoCBRegistry" />
+		<constructor-arg name="cbName" value="dbCircuit" />
+	</bean>
+
+	<bean id="daoCBEventPublisher"
+		class="com.demo.cb.publisher.CBEventPublisher">
+		<constructor-arg name="eventConsumer" ref="daoStateTranEventConsumer" />
+		<constructor-arg name="cb" ref="daoCB" />
+	</bean>
+
+	<bean id="daoStateTranEventConsumer" class="com.demo.cb.consumer.StateTranEventConsumer" />
 </beans>

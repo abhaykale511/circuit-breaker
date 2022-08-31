@@ -1,41 +1,47 @@
-package com.demo.aspect;
+package com.demo.cb.aspect;
 
-import static com.demo.util.SupplierUtil.rethrowSupplier;
+import static com.demo.cb.util.SupplierUtil.rethrowSupplier;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.demo.exception.CirciutBreakerExceptionWrapper;
+import com.demo.cb.CB;
+import com.demo.cb.exception.CircuitBreakerExceptionWrapper;
 
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.decorators.Decorators;
 
-public class ResourceCircuitBreakerAspect implements ApplicationContextAware {
+public class ResourceCircuitBreakerAspect implements ApplicationContextAware{
 
-	private CircuitBreaker circuitBreaker;
-
-	private String circuitBreakerFlagProp;
+	private final CircuitBreaker circuitBreaker;
+	
+	private final String flagName;
 
 	private ApplicationContext context;
 
 	private static final Logger LOG = LoggerFactory.getLogger(ResourceCircuitBreakerAspect.class);
+	
+	public ResourceCircuitBreakerAspect(CB cb,String flagName) {
+		circuitBreaker=cb.getCircuitBreaker();
+		this.flagName=flagName;
+	}
+	
 
 	final public Object circuitWrap(ProceedingJoinPoint joinPoint) throws Throwable {
 
 		boolean enableCircuitBreaker = Boolean
-				.parseBoolean(context.getEnvironment().getProperty(circuitBreakerFlagProp));
+				.parseBoolean(context.getEnvironment().getProperty(flagName));
 
 		Object returnValue = enableCircuitBreaker ? proceedWithCircuit(joinPoint) : joinPoint.proceed();
-
+        
 		LOG.info("Around after class - {}, method - {}, returns - {}",
 				joinPoint.getSignature().getDeclaringType().getName(), joinPoint.getSignature().getName(), returnValue);
 
@@ -46,7 +52,7 @@ public class ResourceCircuitBreakerAspect implements ApplicationContextAware {
 		Object returnValue = null;
 		try {
 			returnValue = execute(rethrowSupplier(joinPoint::proceed), this::fallback);
-		} catch (CirciutBreakerExceptionWrapper e) {
+		} catch (CircuitBreakerExceptionWrapper e) {
 			Throwable ex = e.getCause();
 			LOG.error("Exception in {} aspect", circuitBreaker.getName(), ex);
 			if (!(ex instanceof CallNotPermittedException))
@@ -63,7 +69,7 @@ public class ResourceCircuitBreakerAspect implements ApplicationContextAware {
 	}
 
 	private Object fallback(Throwable ex) {
-		throw new CirciutBreakerExceptionWrapper(ex);
+		throw new CircuitBreakerExceptionWrapper(ex);
 	}
 
 	@Override
@@ -71,11 +77,4 @@ public class ResourceCircuitBreakerAspect implements ApplicationContextAware {
 		this.context = applicationContext;
 	}
 
-	public void setCircuitBreakerFlagProp(String circuitBreakerFlagProp) {
-		this.circuitBreakerFlagProp = circuitBreakerFlagProp;
-	}
-
-	public void setCircuitBreaker(CircuitBreaker circuitBreaker) {
-		this.circuitBreaker = circuitBreaker;
-	}
 }
