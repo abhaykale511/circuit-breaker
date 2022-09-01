@@ -42,7 +42,7 @@
 		<constructor-arg name="cbName" value="dbCircuit" />
 	</bean>
 
-	<bean id="daoCBEventPublisher" class="com.resilience.circuitbreaker.publisher.CBEventPublisher">
+	<bean id="daoCBEventSubscription" class="com.resilience.circuitbreaker.publisher.CBEventSubscription">
 		<constructor-arg name="cb" ref="daoCB" />
 		<constructor-arg name="eventConsumerMap">
 		   <map>

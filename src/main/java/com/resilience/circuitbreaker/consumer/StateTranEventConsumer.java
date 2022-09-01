@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import io.github.resilience4j.circuitbreaker.event.CircuitBreakerOnStateTransitionEvent;
 
-public class StateTranEventConsumer extends AbstractCBEventConsumer<CircuitBreakerOnStateTransitionEvent> {
+public class StateTranEventConsumer extends AbstractEventConsumer<CircuitBreakerOnStateTransitionEvent> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StateTranEventConsumer.class);
 

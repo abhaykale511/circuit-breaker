@@ -19,13 +19,13 @@ import io.github.resilience4j.circuitbreaker.event.CircuitBreakerOnStateTransiti
 import io.github.resilience4j.circuitbreaker.event.CircuitBreakerOnSuccessEvent;
 import io.github.resilience4j.core.EventConsumer;
 
-final public class CBEventPublisher {
+final public class CBEventSubscription {
 
-	private static final Logger LOG = LoggerFactory.getLogger(CBEventPublisher.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CBEventSubscription.class);
 	
 	final private CB cb;
 	
-	public CBEventPublisher(CB cb, Map<EventType,EventConsumer<? extends CircuitBreakerEvent>> eventConsumerMap) {
+	public CBEventSubscription(CB cb, Map<EventType,EventConsumer<? extends CircuitBreakerEvent>> eventConsumerMap) {
 		this.cb = Objects.requireNonNull(cb);		
 		Objects.requireNonNull(eventConsumerMap)
 		.forEach(this::registerConusmer);
