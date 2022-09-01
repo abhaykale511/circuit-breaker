@@ -1,4 +1,4 @@
-package com.demo.cb.exception;
+package com.demo.circuitbreaker.exception;
 
 public class CircuitBreakerExceptionWrapper extends RuntimeException {
 

@@ -1,4 +1,4 @@
-package com.demo.cb.util;
+package com.demo.circuitbreaker.util;
 
 import java.util.function.Supplier;
 

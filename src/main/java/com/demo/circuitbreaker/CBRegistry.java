@@ -1,4 +1,4 @@
-package com.demo.cb;
+package com.demo.circuitbreaker;
 
 import java.util.Objects;
 

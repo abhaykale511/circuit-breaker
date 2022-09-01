@@ -1,4 +1,4 @@
-package com.demo.cb.consumer;
+package com.demo.circuitbreaker.consumer;
 
 import io.github.resilience4j.circuitbreaker.event.CircuitBreakerEvent;
 import io.github.resilience4j.core.EventConsumer;

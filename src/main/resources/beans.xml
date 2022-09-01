@@ -15,12 +15,12 @@
 	</aop:config>
 
 	<bean id="daoCircuitBreakerAspect"
-		class="com.demo.cb.aspect.ResourceCircuitBreakerAspect">
+		class="com.demo.circuitbreaker.aspect.ResourceCircuitBreakerAspect">
 		<constructor-arg name="flagName" value="dao-circuit-aspect.enable" />
 		<constructor-arg name="cb" ref="daoCB" />
 	</bean>
 
-	<bean id="daoCBConfig" class="com.demo.cb.CBConfig">
+	<bean id="daoCBConfig" class="com.demo.circuitbreaker.CBConfig">
 		<property name="recordExceptions">
 			<list>
 				<value>java.net.SocketTimeoutException</value>
@@ -33,20 +33,24 @@
 		<property name="minimumNumberOfCalls" value="6" />
 	</bean>
 
-	<bean id="daoCBRegistry" class="com.demo.cb.CBRegistry">
+	<bean id="daoCBRegistry" class="com.demo.circuitbreaker.CBRegistry">
 		<constructor-arg name="cbConfig" ref="daoCBConfig" />
 	</bean>
 
-	<bean id="daoCB" class="com.demo.cb.CB">
+	<bean id="daoCB" class="com.demo.circuitbreaker.CB">
 		<constructor-arg name="cbRegistry" ref="daoCBRegistry" />
 		<constructor-arg name="cbName" value="dbCircuit" />
 	</bean>
 
-	<bean id="daoCBEventPublisher"
-		class="com.demo.cb.publisher.CBEventPublisher">
-		<constructor-arg name="eventConsumer" ref="daoStateTranEventConsumer" />
+	<bean id="daoCBEventPublisher" class="com.demo.circuitbreaker.publisher.CBEventPublisher">
 		<constructor-arg name="cb" ref="daoCB" />
+		<constructor-arg name="eventConsumerMap">
+		   <map>
+            <entry key="ON_STATE_TRANSITION" value-ref="daoStateTranEventConsumer"/>
+        </map>	
+		</constructor-arg>
+		
 	</bean>
 
-	<bean id="daoStateTranEventConsumer" class="com.demo.cb.consumer.StateTranEventConsumer" />
+	<bean id="daoStateTranEventConsumer" class="com.demo.circuitbreaker.consumer.StateTranEventConsumer" />
 </beans>

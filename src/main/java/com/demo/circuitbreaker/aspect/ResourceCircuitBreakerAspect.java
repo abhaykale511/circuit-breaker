@@ -1,6 +1,6 @@
-package com.demo.cb.aspect;
+package com.demo.circuitbreaker.aspect;
 
-import static com.demo.cb.util.SupplierUtil.rethrowSupplier;
+import static com.demo.circuitbreaker.util.SupplierUtil.rethrowSupplier;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -12,8 +12,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.demo.cb.CB;
-import com.demo.cb.exception.CircuitBreakerExceptionWrapper;
+import com.demo.circuitbreaker.CB;
+import com.demo.circuitbreaker.exception.CircuitBreakerExceptionWrapper;
 
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;

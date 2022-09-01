@@ -1,4 +1,4 @@
-package com.demo.cb.consumer;
+package com.demo.circuitbreaker.consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
