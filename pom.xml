@@ -8,7 +8,7 @@
 		<version>2.7.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.demo.service</groupId>
+	<groupId>com.resilience</groupId>
 	<artifactId>circuit-breaker</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>demo</name>

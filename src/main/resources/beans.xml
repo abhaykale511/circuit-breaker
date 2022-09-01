@@ -7,7 +7,7 @@
     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop 
     http://www.springframework.org/schema/aop/spring-aop.xsd">
 	<aop:config>
-		<aop:pointcut expression="execution(* com.demo.dao.*.*(..))" id="daoPointCut" />
+		<aop:pointcut expression="execution(* com.resilience.dao.*.*(..))" id="daoPointCut" />
 		
 		<aop:aspect id="daoCBAt" ref="daoCircuitBreakerAspect">
 			<aop:around method="circuitWrap" pointcut-ref="daoPointCut" />
@@ -15,12 +15,12 @@
 	</aop:config>
 
 	<bean id="daoCircuitBreakerAspect"
-		class="com.demo.circuitbreaker.aspect.ResourceCircuitBreakerAspect">
+		class="com.resilience.circuitbreaker.aspect.ResourceCircuitBreakerAspect">
 		<constructor-arg name="flagName" value="dao-circuit-aspect.enable" />
 		<constructor-arg name="cb" ref="daoCB" />
 	</bean>
 
-	<bean id="daoCBConfig" class="com.demo.circuitbreaker.CBConfig">
+	<bean id="daoCBConfig" class="com.resilience.circuitbreaker.CBConfig">
 		<property name="recordExceptions">
 			<list>
 				<value>java.net.SocketTimeoutException</value>
@@ -33,21 +33,21 @@
 		<property name="minimumNumberOfCalls" value="6" />
 	</bean>
 
-	<bean id="daoCBRegistry" class="com.demo.circuitbreaker.CBRegistry">
+	<bean id="daoCBRegistry" class="com.resilience.circuitbreaker.CBRegistry">
 		<constructor-arg name="cbConfig" ref="daoCBConfig" />
 	</bean>
 
-	<bean id="daoCB" class="com.demo.circuitbreaker.CB">
+	<bean id="daoCB" class="com.resilience.circuitbreaker.CB">
 		<constructor-arg name="cbRegistry" ref="daoCBRegistry" />
 		<constructor-arg name="cbName" value="dbCircuit" />
 	</bean>
 
-	<bean id="daoCBEventPublisher" class="com.demo.circuitbreaker.publisher.CBEventPublisher">
+	<bean id="daoCBEventPublisher" class="com.resilience.circuitbreaker.publisher.CBEventPublisher">
 		<constructor-arg name="cb" ref="daoCB" />
 		<constructor-arg name="eventConsumerMap">
 		   <map>
             <entry key="ON_STATE_TRANSITION" >
-   				 <bean class="com.demo.circuitbreaker.consumer.StateTranEventConsumer" />
+   				 <bean class="com.resilience.circuitbreaker.consumer.StateTranEventConsumer" />
             </entry>
         </map>	
 		</constructor-arg>	
