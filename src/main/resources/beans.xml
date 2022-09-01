@@ -46,11 +46,11 @@
 		<constructor-arg name="cb" ref="daoCB" />
 		<constructor-arg name="eventConsumerMap">
 		   <map>
-            <entry key="ON_STATE_TRANSITION" value-ref="daoStateTranEventConsumer"/>
+            <entry key="ON_STATE_TRANSITION" >
+   				 <bean class="com.demo.circuitbreaker.consumer.StateTranEventConsumer" />
+            </entry>
         </map>	
-		</constructor-arg>
-		
+		</constructor-arg>	
 	</bean>
 
-	<bean id="daoStateTranEventConsumer" class="com.demo.circuitbreaker.consumer.StateTranEventConsumer" />
 </beans>

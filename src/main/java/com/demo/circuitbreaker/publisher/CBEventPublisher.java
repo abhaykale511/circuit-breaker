@@ -3,6 +3,9 @@ package com.demo.circuitbreaker.publisher;
 import java.util.Map;
 import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.demo.circuitbreaker.CB;
 
 import io.github.resilience4j.circuitbreaker.event.CircuitBreakerEvent;
@@ -18,6 +21,7 @@ import io.github.resilience4j.core.EventConsumer;
 
 final public class CBEventPublisher {
 
+	private static final Logger LOG = LoggerFactory.getLogger(CBEventPublisher.class);
 	
 	final private CB cb;
 	
@@ -31,6 +35,8 @@ final public class CBEventPublisher {
 	@SuppressWarnings("unchecked")
 	private void registerConusmer(EventType event,EventConsumer<? extends CircuitBreakerEvent> consumer) {
 
+		LOG.debug("Event: {} Event Consumer: {}", event,consumer);
+		
 		switch (event) {
 		
 		case ON_SUCCESS:
